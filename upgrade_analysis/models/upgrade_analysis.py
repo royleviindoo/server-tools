@@ -104,9 +104,25 @@ class UpgradeAnalysis(models.Model):
                     full_path
                 )
         logfile = os.path.join(full_path, filename)
+        if 'openupgrade_scripts/scripts' in logfile:
+            return None
         try:
+            if '/home/royle/Viindoo/sources/tvtmaaddons-16.0/' in logfile:
+                logfile = logfile.replace('/home/royle/Viindoo/sources/tvtmaaddons-16.0/', '/home/royle/Viindoo/sources/odoo-openupgrade-tvtmaaddons-15.0/')
+                logfile = logfile.replace('/migrations/', '/')
+                full_path = full_path.replace('/home/royle/Viindoo/sources/tvtmaaddons-16.0/', '/home/royle/Viindoo/sources/odoo-openupgrade-tvtmaaddons-15.0/')
+                full_path = full_path.replace('/migrations/', '/')
+                if not os.path.exists(full_path):
+                    try:
+                        os.makedirs(full_path)
+                    except os.error:
+                        return "ERROR: could not create migrations directory %s:\n" % (
+                            full_path
+                        )
+            else:
+                return None 
             f = open(logfile, "w")
-        except Exception:
+        except Exception as e:
             return "ERROR: could not open file %s for writing:\n" % logfile
         _logger.debug("Writing analysis to %s", logfile)
         f.write(content)
